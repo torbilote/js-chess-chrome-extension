@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "Chess Supporter",
+  "version": "0.1.0",
+  "description": "Lokalny pomocnik: podpowiada najlepszy ruch (Stockfish) podczas partii na chess.com. Tylko do użytku osobistego.",
+  "permissions": ["offscreen", "storage", "activeTab"],
+  "background": {
+    "service_worker": "background/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.chess.com/play/*"],
+      "js": ["content/content.js"],
+      "css": ["content/overlay.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "Chess Supporter",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
+}
