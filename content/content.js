@@ -134,16 +134,23 @@ function analyzeIfChanged() {
   }
 }
 
+// Throttle rather than debounce: we observe the whole body, where clocks
+// mutate continuously, so a resetting debounce would never fire.
 function scheduleAnalyze() {
-  clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(analyzeIfChanged, CONFIG.debounceMs);
+  if (debounceTimer) return;
+  debounceTimer = setTimeout(() => {
+    debounceTimer = null;
+    analyzeIfChanged();
+  }, CONFIG.debounceMs);
 }
 
 function startObserving() {
-  const target = document.querySelector(CONFIG.moveListSelector) || document.body;
+  // Observe the body, not the move list itself: chess.com is an SPA and
+  // replaces the move list element on navigation (e.g. /play -> /game/...),
+  // which would leave an observer on the old element silently dead.
   if (observer) observer.disconnect();
   observer = new MutationObserver(scheduleAnalyze);
-  observer.observe(target, { childList: true, subtree: true });
+  observer.observe(document.body, { childList: true, subtree: true });
   scheduleAnalyze();
 }
 

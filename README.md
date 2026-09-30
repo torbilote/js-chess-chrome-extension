@@ -52,8 +52,9 @@ content script (chess.com)  --ruchy SAN-->  background service worker
   konsoli offscreen — patrz „Debugowanie" poniżej), więc podpowiedź może
   dotyczyć nieaktualnej pozycji. W praktyce dla zwykłych partii (bez
   bardzo nietypowych zapisów) nie powinno się to zdarzać.
-- Rozszerzenie działa tylko na `https://www.chess.com/play/*` (partie
-  na żywo / z botem) — nie obsługuje strony analizy.
+- Rozszerzenie działa tylko na `https://www.chess.com/play/*` oraz
+  `https://www.chess.com/game/*` (partie na żywo / z botem) — nie obsługuje
+  strony analizy.
 
 ## Instalacja jako rozszerzenie w Chrome
 

@@ -20,8 +20,9 @@ colorRadios.forEach((radio) => {
 });
 
 chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
-  if (!tab?.url || !tab.url.startsWith('https://www.chess.com/play/')) {
-    status.textContent = 'Ta karta nie jest partią na chess.com/play/...';
+  const supported = ['https://www.chess.com/play/', 'https://www.chess.com/game/'];
+  if (!tab?.url || !supported.some((prefix) => tab.url.startsWith(prefix))) {
+    status.textContent = 'Ta karta nie jest partią na chess.com/play/... ani chess.com/game/...';
     return;
   }
   chrome.tabs.sendMessage(tab.id, { type: 'GET_STATUS' }, (resp) => {
