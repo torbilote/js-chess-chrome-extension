@@ -57,15 +57,39 @@ function handleContextInvalidated() {
   console.warn('[ChessSupporter] Extension context invalidated — odśwież kartę, aby podpowiedzi znowu działały.');
 }
 
+// chess.com writes the promotion piece as a plain, localized letter, e.g.
+// "c8=H+" in Polish (H = hetman = queen). chess.js only understands English
+// letters, and an unparsed move stops the replay in offscreen.js — the engine
+// then keeps analysing the pre-promotion position. Map known locale letters
+// (pl: H/W/G/S, de: D/T/L/S, fr: D/T/F/C, es: D/T/A/C) to English ones.
+const PROMOTION_PIECE_MAP = {
+  Q: 'Q', R: 'R', B: 'B', N: 'N',
+  H: 'Q', D: 'Q',
+  W: 'R', T: 'R',
+  G: 'B', L: 'B', F: 'B', A: 'B',
+  S: 'N', C: 'N',
+};
+
+function buildSan(figurine, text) {
+  const isPromotion = /^[a-h]/.test(text) && text.includes('=');
+  if (!isPromotion) return figurine + text;
+  // A figurine on a pawn move can only be the promotion piece (e.g. "c8=" +
+  // queen icon), so it belongs after the "=", not in front of the move.
+  return text.replace(/=([A-Za-z])?/, (_, letter) => {
+    const piece = figurine || PROMOTION_PIECE_MAP[(letter || '').toUpperCase()] || letter || '';
+    return '=' + piece;
+  });
+}
+
 function extractSanMoves() {
   const nodes = document.querySelectorAll(`${CONFIG.moveListSelector} ${CONFIG.moveNodeSelector}`);
   const moves = [];
   nodes.forEach((node) => {
     const figurineEl = node.querySelector(CONFIG.figurineSelector);
-    const prefix = figurineEl ? figurineEl.dataset.figurine || '' : '';
+    const figurine = figurineEl ? figurineEl.dataset.figurine || '' : '';
     const text = (node.textContent || '').replace(/\s+/g, '');
     if (!text) return;
-    moves.push(prefix + text);
+    moves.push(buildSan(figurine, text));
   });
   return moves;
 }
